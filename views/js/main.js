@@ -458,8 +458,8 @@ var resizePizzas = function(size) {
     }
 
     //carries out batch edit on dom elements to avoid layout change
-    for (var i = 0; i < randPizzas.length; i++) {
-        randPizzas[i].style.width = newWidths[i];
+    for (var j = 0; j < randPizzas.length; j++) {
+        randPizzas[j].style.width = newWidths[j];
     }
 
   }
@@ -517,8 +517,8 @@ function updatePositions() {
     toUpdate.push(items[i].basicLeft + 100 * phase + 'px');
   }
   //carries out batch edit on dom elements to avoid layout change
-  for (var i = 0; i < items.length; i++) {
-    items[i].style.left = toUpdate[i];
+  for (var j = 0; j < items.length; j++) {
+    items[j].style.left = toUpdate[j];
   }
 
   // User Timing API to the rescue again. Seriously, it's worth learning.
