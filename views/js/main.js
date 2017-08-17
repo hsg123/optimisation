@@ -456,6 +456,8 @@ var resizePizzas = function(size) {
       var dx = determineDx(randPizzas[i], size);
       newWidths.push((randPizzas[i].offsetWidth + dx) + 'px');
     }
+
+    //carries out batch edit on dom elements to avoid layout change
     for (var i = 0; i < randPizzas.length; i++) {
         randPizzas[i].style.width = newWidths[i];
     }
@@ -501,7 +503,7 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
 
 // The following code for sliding background pizzas was pulled from Ilya's demo found at:
 // https://www.igvita.com/slides/2012/devtools-tips-and-tricks/jank-demo.html
-
+//items was made a global variable to save us from calling it again
 var items = document.getElementsByClassName('mover');
 // Moves the sliding background pizzas based on scroll position
 function updatePositions() {
@@ -514,7 +516,7 @@ function updatePositions() {
     var phase = Math.sin((bodyScrollTop / 1250) + (i % 5));
     toUpdate.push(items[i].basicLeft + 100 * phase + 'px');
   }
-
+  //carries out batch edit on dom elements to avoid layout change
   for (var i = 0; i < items.length; i++) {
     items[i].style.left = toUpdate[i];
   }
@@ -536,6 +538,7 @@ window.addEventListener('scroll', updatePositions);
 document.addEventListener('DOMContentLoaded', function() {
   var cols = 8;
   var s = 256;
+  //200 pizzas were uneccesary so it was reduced to what will be visible to the user
   for (var i = 0; i < 21; i++) {
     var elem = document.createElement('img');
     elem.className = 'mover';

@@ -1,55 +1,81 @@
-## Website Performance Optimization portfolio project
+# Website Optimization
 
-Your challenge, if you wish to accept it (and we sure hope you will), is to optimize this online portfolio for speed! In particular, optimize the critical rendering path and make this page render as quickly as possible by applying the techniques you've picked up in the [Critical Rendering Path course](https://www.udacity.com/course/ud884).
 
-To get started, check out the repository and inspect the code.
+I have optimized a provided website with a number of optimizations so that it achieves a target PageSpeed score and runs at 60 frames per second.
 
-### Getting started
+## Launching
 
-#### Part 1: Optimize PageSpeed Insights score for index.html
+The site is launced by simply opening the index.html in your preferred web browser which will lead to the optomised portfolio. Clicking on Cam's Pizzeria will lead to the pizza site.
 
-Some useful tips to help you get started:
+## Portfolio Optomisations
 
-1. Check out the repository
-1. To inspect the site on your phone, you can run a local server
+### Minification
 
-  ```bash
-  $> cd /path/to/your-project-folder
-  $> python -m SimpleHTTPServer 8080
-  ```
+The Index.html file was minified to reduce the size of the response from the server.
 
-1. Open a browser and visit localhost:8080
-1. Download and install [ngrok](https://ngrok.com/) to the top-level of your project directory to make your local server accessible remotely.
+### Font Removal
 
-  ``` bash
-  $> cd /path/to/your-project-folder
-  $> ./ngrok http 8080
-  ```
+The font provided was taking a while to load so it was removed.
 
-1. Copy the public URL ngrok gives you and try running it through PageSpeed Insights! Optional: [More on integrating ngrok, Grunt and PageSpeed.](http://www.jamescryer.com/2014/06/12/grunt-pagespeed-and-ngrok-locally-testing/)
+### Inline CSS and Javascript
 
-Profile, optimize, measure... and then lather, rinse, and repeat. Good luck!
+The content of style.css and perfmatters.js was inserted into Index.html in order to shorten the critical rendering path
 
-#### Part 2: Optimize Frames per Second in pizza.html
+### Media Query
 
-To optimize views/pizza.html, you will need to modify views/js/main.js until your frames per second rate is 60 fps or higher. You will find instructive comments in main.js. 
+The print.css was given the `media="print"` attribute so that we only needed to request it from the server if we needed to print it.
 
-You might find the FPS Counter/HUD Display useful in Chrome developer tools described here: [Chrome Dev Tools tips-and-tricks](https://developer.chrome.com/devtools/docs/tips-and-tricks).
+### Async Javascipt
 
-### Optimization Tips and Tricks
-* [Optimizing Performance](https://developers.google.com/web/fundamentals/performance/ "web performance")
-* [Analyzing the Critical Rendering Path](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/analyzing-crp.html "analyzing crp")
-* [Optimizing the Critical Rendering Path](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/optimizing-critical-rendering-path.html "optimize the crp!")
-* [Avoiding Rendering Blocking CSS](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/render-blocking-css.html "render blocking css")
-* [Optimizing JavaScript](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/adding-interactivity-with-javascript.html "javascript")
-* [Measuring with Navigation Timing](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/measure-crp.html "nav timing api"). We didn't cover the Navigation Timing API in the first two lessons but it's an incredibly useful tool for automated page profiling. I highly recommend reading.
-* <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/eliminate-downloads.html">The fewer the downloads, the better</a>
-* <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/optimize-encoding-and-transfer.html">Reduce the size of text</a>
-* <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization.html">Optimize images</a>
-* <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching.html">HTTP caching</a>
+analytics.js was fetched using the async tag so that it did not block the rendering of the page.
 
-### Customization with Bootstrap
-The portfolio was built on Twitter's <a href="http://getbootstrap.com/">Bootstrap</a> framework. All custom styles are in `dist/css/portfolio.css` in the portfolio repo.
+### Image compression
 
-* <a href="http://getbootstrap.com/css/">Bootstrap's CSS Classes</a>
-* <a href="http://getbootstrap.com/components/">Bootstrap's Components</a>
+The images used are now compressed, reducing their load times.
+
+
+## Pizza Optomisations
+
+### will-change
+
+The `will-change : transform` was used to tell the browser that the pizzas in the background would need their own layer because they will be changed. This reduced the paint operations of the browser to be offloaded to the GPU through composition.
+
+### getElementsByClassName
+
+`document.getElementsByClassName` was used instead of document.querySelectorAll() because it is much faster.
+
+### Don't repeat yourself
+
+In cases where the same function call was repeatedly made, it was more efficient to store it in a variale. Take the following for example where randPizza is now used as the placeholder. This spares us the need to make the same `document.getElementsByClassName` call repeatedly.
+
+```var randPizzas = document.getElementsByClassName("randomPizzaContainer");
+    var newWidths = [];
+    for (var i = 0; i < randPizzas.length; i++) {
+      var dx = determineDx(randPizzas[i], size);
+      newWidths.push((randPizzas[i].offsetWidth + dx) + 'px');
+    }
+    for (var i = 0; i < randPizzas.length; i++) {
+        randPizzas[i].style.width = newWidths[i];
+    }
+```
+
+
+### Initializing less pizzas
+
+Previously 200 pizzas were initialized despite they all wouldn't ever be seen. This was drastically reduced which reduced Composite Layers process time.
+
+### Avoiding Layout change
+
+Avoiding uneccesary layout change was done as shown below. `document.body.scrollTop` was called only once. The read on `basicLeft` and edit on `left` were also seperated to avoid layout change on the DOM elements.
+
+```var toUpdate = [];
+  var bodyScrollTop = document.body.scrollTop;
+  for (var i = 0; i < items.length; i++) {
+    var phase = Math.sin((bodyScrollTop / 1250) + (i % 5));
+    toUpdate.push(items[i].basicLeft + 100 * phase + 'px');
+  }
+
+  for (var i = 0; i < items.length; i++) {
+    items[i].style.left = toUpdate[i];
+  }
+```
